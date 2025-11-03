@@ -1,10 +1,12 @@
 const video = document.getElementById("video");
 const requestCameraBtn = document.getElementById("requestCamera");
 const takePictureBtn = document.getElementById("takePicture");
+const useImageCaptureCheckbox = document.getElementById("useImageCapture");
 const currentConstraintsBtn = document.getElementById("currentConstraints");
 const fixConstraintsBtn = document.getElementById("fixConstraints");
 
 let currentStream = null;
+let imageCapture = null;
 let currentConstraints = {
   video: {
     facingMode: "environment",
@@ -54,6 +56,7 @@ function stopStream() {
   if (currentStream) {
     currentStream.getTracks().forEach((track) => track.stop());
     currentStream = null;
+    imageCapture = null;
   }
 }
 
@@ -80,6 +83,18 @@ function requestCamera(constraints) {
     .then((stream) => {
       currentStream = stream;
       video.srcObject = stream;
+
+      // Create ImageCapture instance for full resolution photos
+      const videoTrack = stream.getVideoTracks()[0];
+      if (videoTrack && window.ImageCapture) {
+        imageCapture = new ImageCapture(videoTrack);
+      } else {
+        imageCapture = null;
+        console.warn(
+          "ImageCapture API not supported, will fallback to canvas method"
+        );
+      }
+
       takePictureBtn.disabled = false;
       requestCameraBtn.style.display = "none";
     })
@@ -119,6 +134,35 @@ function takePicture() {
     return;
   }
 
+  // Check if checkbox is checked to use ImageCapture
+  const useImageCapture = useImageCaptureCheckbox.checked;
+
+  // Use ImageCapture.takePhoto() for full resolution if checkbox is checked and available
+  if (useImageCapture && imageCapture) {
+    imageCapture
+      .takePhoto()
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `picture-${Date.now()}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      })
+      .catch((error) => {
+        console.error("Error taking photo with ImageCapture:", error);
+        // Fallback to canvas method
+        takePictureCanvas();
+      });
+  } else {
+    // Use canvas method if checkbox is unchecked or ImageCapture is not available
+    takePictureCanvas();
+  }
+}
+
+function takePictureCanvas() {
   const canvas = document.createElement("canvas");
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
