@@ -22,8 +22,8 @@ const fixConstraints = {
     frameRate: 20,
     focusMode: "continuous",
     aspectRatio: 1.777777778,
-    width: { min: 300, ideal: 1920, max: 5000 },
-    height: { min: 300, ideal: 1080, max: 5000 },
+    width: { min: 300, ideal: 3840, max: 5000 },
+    height: { min: 300, ideal: 2160, max: 5000 },
   },
 };
 
