@@ -1,6 +1,8 @@
 const video = document.getElementById("video");
 const requestCameraBtn = document.getElementById("requestCamera");
 const takePictureBtn = document.getElementById("takePicture");
+const fileCaptureBtn = document.getElementById("fileCaptureBtn");
+const fileInputCapture = document.getElementById("fileInputCapture");
 const useImageCaptureCheckbox = document.getElementById("useImageCapture");
 const currentConstraintsBtn = document.getElementById("currentConstraints");
 const fixConstraintsBtn = document.getElementById("fixConstraints");
@@ -187,6 +189,30 @@ requestCameraBtn.addEventListener("click", () => {
 });
 
 takePictureBtn.addEventListener("click", takePicture);
+
+fileCaptureBtn.addEventListener("click", () => {
+  fileInputCapture.click();
+});
+
+fileInputCapture.addEventListener("change", (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    // Download the captured file
+    const url = URL.createObjectURL(file);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `file-capture-${Date.now()}.${
+      file.name.split(".").pop() || "jpg"
+    }`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    // Reset the input so the same file can be selected again if needed
+    fileInputCapture.value = "";
+  }
+});
 
 currentConstraintsBtn.addEventListener("click", () => {
   currentConstraints = {

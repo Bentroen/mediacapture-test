@@ -48,6 +48,10 @@
             margin-bottom: 10px;
         }
 
+        #fileInputCapture {
+            display: none;
+        }
+
         .checkbox-container {
             display: flex;
             align-items: center;
@@ -112,7 +116,10 @@
         <div class="buttons-container">
             <button id="requestCamera">Request Camera</button>
             <button id="takePicture" disabled>Take Picture</button>
+            <button id="fileCaptureBtn">Capture via File Input</button>
         </div>
+        
+        <input type="file" id="fileInputCapture" accept="image/*" capture="camera">
         
         <div class="checkbox-container">
             <input type="checkbox" id="useImageCapture" checked>
